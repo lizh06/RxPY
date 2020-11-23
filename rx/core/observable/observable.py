@@ -158,6 +158,8 @@ class Observable(typing.Observable):
         # Hide the identity of the auto detach observer
         return Disposable(auto_detach_observer.dispose)
 
+    def __or__(self, op): return self.pipe(op)
+
     @overload
     def pipe(self,
              *operators: Callable[['Observable'], 'Observable']
