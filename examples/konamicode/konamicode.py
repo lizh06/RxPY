@@ -43,9 +43,12 @@ class WSHandler(WebSocketHandler):
         print("WebSocket closed")
 
 
+from pathlib import Path
+here = Path(__file__).parent
+
 class MainHandler(RequestHandler):
     def get(self):
-        self.render("index.html")
+        self.render(str(here / "index.html"))
 
 
 def main():
@@ -53,7 +56,7 @@ def main():
     app = Application([
         url(r"/", MainHandler),
         (r'/ws', WSHandler),
-        (r'/static/(.*)', StaticFileHandler, {'path': "."})
+        (r'/static/(.*)', StaticFileHandler, {'path': str(here)})
     ])
     print("Starting server at port: %s" % port)
     app.listen(port)
