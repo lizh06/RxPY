@@ -158,7 +158,21 @@ class Observable(typing.Observable):
         # Hide the identity of the auto detach observer
         return Disposable(auto_detach_observer.dispose)
 
-    def __or__(self, op): return self.pipe(op)
+    def __or__(self, op):
+        if isinstance(op, (list,tuple)):
+            return self.subscribe(*op)
+        elif isinstance(op, dict):
+            return self.subscribe(**op)
+        else:
+            sub = {}
+            for a in 'on_next on_error on_completed'.split():
+                f = getattr(op, a, None)
+                if f is not None: sub[a] = f
+            if sub:
+                s = getattr(op, 'scheduler', None)
+                if s is not None: sub['scheduler'] = s
+                return self.subscribe(**sub)
+        return self.pipe(op)
 
     @overload
     def pipe(self,
